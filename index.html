@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Thai Stick — Access</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+.btn-access {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-body); font-size: 13px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 14px 32px; border-radius: 4px; cursor: pointer;
+  border: none; transition: opacity 0.2s;
+}
+.btn-access-visitor {
+  background: var(--grad); color: var(--dark);
+}
+.btn-access-visitor:hover { opacity: 0.85; }
+.btn-access-team {
+  background: transparent; color: var(--light);
+  border: 1px solid rgba(255,255,255,0.18);
+  transition: border-color 0.2s;
+}
+.btn-access-team:hover { border-color: rgba(255,255,255,0.4); }
+
+/* PIN modal */
+.pin-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; }
+.pin-overlay.open { display: flex; }
+.pin-modal { background: var(--dark-2); border: 1px solid var(--border); border-radius: 12px; padding: 40px; width: 360px; max-width: 90vw; text-align: center; position: relative; }
+.pin-title { font-family: var(--font-disp); font-size: 26px; font-weight: 400; color: var(--light); margin-bottom: 8px; }
+.pin-sub { font-size: 13px; color: var(--muted); margin-bottom: 32px; }
+.pin-inputs { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; }
+.pin-digit { width: 56px; height: 64px; background: var(--dark-3); border: 1px solid var(--border); border-radius: 8px; color: var(--light); font-size: 28px; font-family: var(--font-mono); text-align: center; outline: none; transition: border-color 0.2s; }
+.pin-digit:focus { border-color: var(--teal); }
+.pin-error { font-size: 12px; color: #ff6b6b; margin-bottom: 16px; min-height: 18px; display: none; line-height: 1.5; }
+.pin-error.show { display: block; }
+.pin-submit { width: 100%; background: var(--grad); border: none; color: var(--dark); padding: 14px; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 4px; cursor: pointer; transition: opacity 0.2s; font-family: var(--font-body); }
+.pin-submit:hover { opacity: 0.85; }
+.pin-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.pin-close { position: absolute; top: 16px; right: 20px; background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; line-height: 1; transition: color 0.2s; }
+.pin-close:hover { color: var(--light); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">
+    <img src="Thai Stick Logo.png" alt="Thai Stick">
+    <span class="nav-logo-text">THAI STICK</span>
+  </a>
+</nav>
+
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid-lines"></div>
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-eyebrow">Medical Cannabis Supply · Perth WA · GMP Certified</div>
+        <h1 class="hero-title">
+          The Supply Partner
+          <strong class="grad-text">Your Dispensary Can Count On.</strong>
+        </h1>
+        <p class="hero-sub">From Thailand to your hands.</p>
+        <div class="hero-actions">
+          <button class="btn-access btn-access-visitor" onclick="goVisitor()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            Enter As Visitor
+          </button>
+          <button class="btn-access btn-access-team" onclick="openPinModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Team Login
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PIN MODAL -->
+<div class="pin-overlay" id="pin-overlay" onclick="closePinOutside(event)">
+  <div class="pin-modal">
+    <button class="pin-close" onclick="closePinModal()">×</button>
+    <div class="pin-title">Team Access</div>
+    <div class="pin-sub">Enter your 4-digit access code</div>
+    <div class="pin-inputs">
+      <input class="pin-digit" type="password" inputmode="numeric" maxlength="1" id="p0" oninput="pinInput(0)" onkeydown="pinKeyDown(event,0)">
+      <input class="pin-digit" type="password" inputmode="numeric" maxlength="1" id="p1" oninput="pinInput(1)" onkeydown="pinKeyDown(event,1)">
+      <input class="pin-digit" type="password" inputmode="numeric" maxlength="1" id="p2" oninput="pinInput(2)" onkeydown="pinKeyDown(event,2)">
+      <input class="pin-digit" type="password" inputmode="numeric" maxlength="1" id="p3" oninput="pinInput(3)" onkeydown="pinKeyDown(event,3)">
+    </div>
+    <div class="pin-error" id="pin-error">Invalid Access Code. Please try again or contact your Administrator.</div>
+    <button class="pin-submit" id="pin-submit" onclick="submitPin()">Verify Access</button>
+  </div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby8iOtGgmpEAqamLS6N-fvlZWcW5fuktj_UGrLCuRMY7mgmcJD18vge5jQldxHOvPU/exec';
+
+function goVisitor() {
+  sessionStorage.setItem('access', 'visitor');
+  window.location.href = 'portfolio.html';
+}
+function openPinModal() {
+  document.getElementById('pin-overlay').classList.add('open');
+  resetPin();
+  setTimeout(() => document.getElementById('p0').focus(), 50);
+}
+function closePinModal() {
+  document.getElementById('pin-overlay').classList.remove('open');
+  resetPin();
+}
+function closePinOutside(e) {
+  if (e.target === document.getElementById('pin-overlay')) closePinModal();
+}
+function resetPin() {
+  ['p0','p1','p2','p3'].forEach(id => document.getElementById(id).value = '');
+  const err = document.getElementById('pin-error');
+  err.classList.remove('show');
+  err.textContent = 'Invalid Access Code. Please try again or contact your Administrator.';
+  const btn = document.getElementById('pin-submit');
+  btn.disabled = false;
+  btn.textContent = 'Verify Access';
+}
+function pinInput(i) {
+  const val = document.getElementById('p' + i).value;
+  if (!/^\d$/.test(val)) { document.getElementById('p' + i).value = ''; return; }
+  if (i < 3) document.getElementById('p' + (i + 1)).focus();
+  const pin = ['p0','p1','p2','p3'].map(id => document.getElementById(id).value).join('');
+  if (pin.length === 4) submitPin();
+}
+function pinKeyDown(e, i) {
+  if (e.key === 'Backspace' && !document.getElementById('p' + i).value && i > 0) {
+    document.getElementById('p' + (i - 1)).focus();
+  }
+}
+function fetchSheet(sheetName) {
+  return new Promise((resolve, reject) => {
+    const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    const script = document.createElement('script');
+    window[cb] = (data) => { delete window[cb]; document.head.removeChild(script); resolve(data); };
+    script.src = `${APPS_SCRIPT_URL}?sheet=${sheetName}&callback=${cb}`;
+    script.onerror = () => { delete window[cb]; reject(new Error('Failed')); };
+    document.head.appendChild(script);
+  });
+}
+async function submitPin() {
+  const pin = ['p0','p1','p2','p3'].map(id => document.getElementById(id).value).join('');
+  if (pin.length < 4) return;
+  const btn = document.getElementById('pin-submit');
+  const err = document.getElementById('pin-error');
+  btn.disabled = true;
+  btn.textContent = 'Verifying…';
+  err.classList.remove('show');
+  try {
+    const rows = await fetchSheet('Pins');
+    const match = rows && rows.find(r => String(r.pin).trim() === pin.trim());
+    if (match) {
+      sessionStorage.setItem('rep_name', match.name || '');
+      sessionStorage.setItem('access', 'team');
+      window.location.href = 'ThaiStick_Website.html';
+    } else {
+      err.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Verify Access';
+      ['p0','p1','p2','p3'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('p0').focus();
+    }
+  } catch(e) {
+    err.textContent = 'Connection error. Please try again.';
+    err.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Verify Access';
+  }
+}
+
+// Nav scroll effect
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  if (nav) nav.style.background = window.scrollY > 60 ? 'rgba(10,14,20,0.97)' : 'rgba(10,14,20,0.85)';
+});
+</script>
+</body>
+</html>
