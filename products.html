@@ -444,9 +444,11 @@ function fetchSheet(sheetName) {
 }
 
 
+let skusLoaded = false;
 function openLogModal() {
   document.getElementById('log-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+  if (!skusLoaded) { skusLoaded = true; loadSKUs(); }
 }
 function closeLogModal() {
   document.getElementById('log-overlay').classList.remove('open');
@@ -534,7 +536,6 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     calcPricing();
   }
-  loadSKUs();
 });
 
 function toggleTierNav() {

@@ -664,9 +664,11 @@ function closeModalOutside(e) {
   if (e.target === document.getElementById('modal-overlay')) closeModal();
 }
 
+let skusLoaded = false;
 function openLogModal() {
   document.getElementById('log-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+  if (!skusLoaded) { skusLoaded = true; loadSKUs(); }
 }
 function closeLogModal() {
   document.getElementById('log-overlay').classList.remove('open');
@@ -930,7 +932,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const repInput = document.querySelector('[name="rep_name"]');
     if (repInput) repInput.value = repName;
   }
-  loadSKUs();
   await loadPortfolio();
   loadBundle();
   const tier = new URLSearchParams(window.location.search).get('tier') || 'value';
