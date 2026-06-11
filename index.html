@@ -42,6 +42,13 @@
 .pin-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 .pin-close { position: absolute; top: 16px; right: 20px; background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; line-height: 1; transition: color 0.2s; }
 .pin-close:hover { color: var(--light); }
+
+/* Registration modal */
+.reg-label { display: block; font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+.reg-input { width: 100%; background: var(--dark-3); border: 1px solid var(--border); border-radius: 8px; color: var(--light); font-size: 14px; font-family: var(--font-body); padding: 12px 16px; outline: none; transition: border-color 0.2s; box-sizing: border-box; }
+.reg-input:focus { border-color: var(--teal); }
+.reg-back { background: none; border: none; color: var(--muted); font-size: 12px; cursor: pointer; margin-top: 14px; font-family: var(--font-body); transition: color 0.2s; }
+.reg-back:hover { color: var(--light); }
 </style>
 </head>
 <body>
@@ -80,6 +87,37 @@
   </div>
 </section>
 
+<!-- VISITOR REGISTRATION MODAL -->
+<div class="pin-overlay" id="reg-overlay">
+  <div class="pin-modal" style="width:420px;max-width:92vw;">
+    <div class="pin-title">Welcome</div>
+    <div class="pin-sub">Please introduce yourself to view the catalogue</div>
+    <div class="pin-error" id="reg-error">Please fill in all fields.</div>
+    <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:24px;text-align:left;">
+      <div>
+        <label class="reg-label">Full Name</label>
+        <input class="reg-input" type="text" id="reg-name">
+      </div>
+      <div>
+        <label class="reg-label">Company</label>
+        <input class="reg-input" type="text" id="reg-company">
+      </div>
+      <div>
+        <label class="reg-label">Email</label>
+        <input class="reg-input" type="email" id="reg-email">
+      </div>
+      <div>
+        <label class="reg-label">Phone Number</label>
+        <input class="reg-input" type="tel" id="reg-phone">
+      </div>
+    </div>
+    <button class="pin-submit" id="reg-submit" onclick="submitRegistration()">Access Catalogue</button>
+    <div style="text-align:center;">
+      <button class="reg-back" onclick="closeRegModal()">← Go Back</button>
+    </div>
+  </div>
+</div>
+
 <!-- PIN MODAL -->
 <div class="pin-overlay" id="pin-overlay" onclick="closePinOutside(event)">
   <div class="pin-modal">
@@ -98,9 +136,47 @@
 </div>
 
 <script>
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby8iOtGgmpEAqamLS6N-fvlZWcW5fuktj_UGrLCuRMY7mgmcJD18vge5jQldxHOvPU/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzha6ED7R4JqAXq0AqoBk1bndu0hJwDbyBrzJQawB093HvwGZT7fUQZ9cP7JzYGpPucEA/exec';
 
 function goVisitor() {
+  const existing = localStorage.getItem('visitor_info');
+  if (existing) {
+    sessionStorage.setItem('access', 'visitor');
+    window.location.href = 'portfolio.html';
+  } else {
+    document.getElementById('reg-overlay').classList.add('open');
+    setTimeout(() => document.getElementById('reg-name').focus(), 50);
+  }
+}
+function closeRegModal() {
+  document.getElementById('reg-overlay').classList.remove('open');
+  document.getElementById('reg-error').classList.remove('show');
+}
+async function submitRegistration() {
+  const name = document.getElementById('reg-name').value.trim();
+  const company = document.getElementById('reg-company').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const err = document.getElementById('reg-error');
+  const btn = document.getElementById('reg-submit');
+  if (!name || !company || !email || !phone) {
+    err.textContent = 'Please fill in all fields.';
+    err.classList.add('show');
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  err.classList.remove('show');
+  const info = { name, company, email, phone };
+  localStorage.setItem('visitor_info', JSON.stringify(info));
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sheet: 'VisitorLog', ...info })
+    });
+  } catch(e) { /* continue even if logging fails */ }
   sessionStorage.setItem('access', 'visitor');
   window.location.href = 'portfolio.html';
 }
