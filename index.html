@@ -114,7 +114,25 @@
     <button class="pin-submit" id="reg-submit" onclick="submitRegistration()">Access Catalogue</button>
     <div style="text-align:center;">
       <button class="reg-back" onclick="closeRegModal()">← Go Back</button>
+      <button class="reg-back" onclick="openCustomerPinModal()" style="margin-left:16px;color:var(--teal);">Access with a Pin →</button>
     </div>
+  </div>
+</div>
+
+<!-- CUSTOMER PIN MODAL -->
+<div class="pin-overlay" id="customer-pin-overlay" onclick="closeCustomerPinOutside(event)">
+  <div class="pin-modal">
+    <button class="pin-close" onclick="closeCustomerPinModal()">×</button>
+    <div class="pin-title">Customer Access</div>
+    <div class="pin-sub">Enter your 4-digit customer PIN</div>
+    <div class="pin-inputs">
+      <input class="pin-digit" type="password" inputmode="numeric" maxlength="1" id="cp0" oninput="customerPinInput(0)" onkeydown="customerPinKeyDown(event,0)">
+      <input class="pin-digit" type="password" inputmode="numeric" maxlength="1" id="cp1" oninput="customerPinInput(1)" onkeydown="customerPinKeyDown(event,1)">
+      <input class="pin-digit" type="password" inputmode="numeric" maxlength="1" id="cp2" oninput="customerPinInput(2)" onkeydown="customerPinKeyDown(event,2)">
+      <input class="pin-digit" type="password" inputmode="numeric" maxlength="1" id="cp3" oninput="customerPinInput(3)" onkeydown="customerPinKeyDown(event,3)">
+    </div>
+    <div class="pin-error" id="customer-pin-error">Invalid PIN. Please try again or contact Thai Stick.</div>
+    <button class="pin-submit" id="customer-pin-submit" onclick="submitCustomerPin()">Verify Access</button>
   </div>
 </div>
 
@@ -244,6 +262,70 @@ async function submitPin() {
       btn.textContent = 'Verify Access';
       ['p0','p1','p2','p3'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('p0').focus();
+    }
+  } catch(e) {
+    err.textContent = 'Connection error. Please try again.';
+    err.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Verify Access';
+  }
+}
+
+function openCustomerPinModal() {
+  closeRegModal();
+  document.getElementById('customer-pin-overlay').classList.add('open');
+  resetCustomerPin();
+  setTimeout(() => document.getElementById('cp0').focus(), 50);
+}
+function closeCustomerPinModal() {
+  document.getElementById('customer-pin-overlay').classList.remove('open');
+  resetCustomerPin();
+}
+function closeCustomerPinOutside(e) {
+  if (e.target === document.getElementById('customer-pin-overlay')) closeCustomerPinModal();
+}
+function resetCustomerPin() {
+  ['cp0','cp1','cp2','cp3'].forEach(id => document.getElementById(id).value = '');
+  const err = document.getElementById('customer-pin-error');
+  err.classList.remove('show');
+  err.textContent = 'Invalid PIN. Please try again or contact Thai Stick.';
+  const btn = document.getElementById('customer-pin-submit');
+  btn.disabled = false;
+  btn.textContent = 'Verify Access';
+}
+function customerPinInput(i) {
+  const val = document.getElementById('cp' + i).value;
+  if (!/^\d$/.test(val)) { document.getElementById('cp' + i).value = ''; return; }
+  if (i < 3) document.getElementById('cp' + (i + 1)).focus();
+  const pin = ['cp0','cp1','cp2','cp3'].map(id => document.getElementById(id).value).join('');
+  if (pin.length === 4) submitCustomerPin();
+}
+function customerPinKeyDown(e, i) {
+  if (e.key === 'Backspace' && !document.getElementById('cp' + i).value && i > 0) {
+    document.getElementById('cp' + (i - 1)).focus();
+  }
+}
+async function submitCustomerPin() {
+  const pin = ['cp0','cp1','cp2','cp3'].map(id => document.getElementById(id).value).join('');
+  if (pin.length < 4) return;
+  const btn = document.getElementById('customer-pin-submit');
+  const err = document.getElementById('customer-pin-error');
+  btn.disabled = true;
+  btn.textContent = 'Verifying…';
+  err.classList.remove('show');
+  try {
+    const rows = await fetchSheet('Customer_Pins');
+    const match = rows && rows.find(r => String(r.pin).trim() === pin.trim());
+    if (match) {
+      sessionStorage.setItem('access', 'visitor');
+      sessionStorage.setItem('customer_name', match.name || '');
+      window.location.href = 'portfolio.html';
+    } else {
+      err.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Verify Access';
+      ['cp0','cp1','cp2','cp3'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('cp0').focus();
     }
   } catch(e) {
     err.textContent = 'Connection error. Please try again.';
