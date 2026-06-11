@@ -1487,3 +1487,92 @@ footer {
 .ref-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 @media (max-width: 768px) { .ref-two-col { grid-template-columns: 1fr; } }
 
+/* ══════════════════════════════
+   MOBILE — 480px and below
+══════════════════════════════ */
+@media (max-width: 480px) {
+  /* Base spacing */
+  .container { padding: 0 16px; }
+  nav { padding: 0 16px; }
+
+  /* Section padding */
+  section { padding-top: 72px !important; padding-bottom: 60px !important; }
+  #hero { padding: 100px 0 60px; min-height: auto; }
+
+  /* Typography */
+  .hero-title { font-size: clamp(32px, 9vw, 44px); }
+  .hero-sub { font-size: 15px; margin-bottom: 28px; }
+  .hero-eyebrow { font-size: 10px; padding: 5px 10px; }
+  .section-title { font-size: clamp(26px, 7vw, 36px); }
+  .section-sub { font-size: 14px; }
+  .hero-actions { flex-direction: column; gap: 12px; }
+  .hero-actions .btn, .hero-actions button { width: 100%; justify-content: center; }
+
+  /* Nav */
+  nav.nav-open .nav-links { padding: 12px 16px 20px; gap: 8px; }
+
+  /* Modals — PIN & registration */
+  .pin-modal { padding: 28px 20px; width: calc(100vw - 32px) !important; max-width: 100% !important; }
+  .pin-digit { width: 48px; height: 56px; font-size: 24px; }
+  .pin-inputs { gap: 8px; }
+
+  /* Log Visit modal */
+  .modal { padding: 20px 16px; max-height: 90vh; overflow-y: auto; }
+  .log-form-grid { grid-template-columns: 1fr; gap: 12px; }
+  .sku-check-grid { grid-template-columns: 1fr 1fr; }
+  .log-modal-title { font-size: 17px; }
+
+  /* Products page — Global Inputs */
+  .gi-grid { grid-template-columns: 1fr 1fr !important; gap: 10px; }
+  .gi-box { padding: 16px; }
+  .gi-label { font-size: 10px; }
+  .gi-input { font-size: 14px; padding: 8px 10px; }
+
+  /* Pricing table — horizontal scroll with hint */
+  .ps-outer-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .ps-outer-scroll::after {
+    content: '← scroll →';
+    display: block; text-align: center;
+    font-size: 10px; color: var(--muted);
+    padding: 6px 0 2px; opacity: 0.6;
+  }
+  .ps-table { min-width: 560px; }
+  .ps-table th, .ps-table td { padding: 8px 10px; font-size: 11px; }
+
+  /* Tier tabs */
+  .tier-tabs { gap: 8px; }
+  .tier-tab { padding: 8px 14px; font-size: 10px; }
+
+  /* SKU cards */
+  .sku-grid { grid-template-columns: 1fr !important; }
+
+  /* FAB button */
+  .log-visit-fab { bottom: 20px; left: 16px; right: auto; width: 48px; height: 48px; }
+  .fab-label { display: none; }
+  .fab-icon { font-size: 22px; }
+
+  /* Dashboard tables */
+  .dash-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .dash-table { min-width: 500px; font-size: 12px; }
+
+  /* Forms */
+  .form-grid { grid-template-columns: 1fr !important; }
+  .btn-submit { width: 100%; }
+}
+
+/* ── Tablet tweaks 600–900px ── */
+@media (min-width: 481px) and (max-width: 900px) {
+  .hero-title { font-size: clamp(36px, 6vw, 54px); }
+  .log-form-grid { grid-template-columns: 1fr 1fr; }
+  .gi-grid { grid-template-columns: repeat(4, 1fr); }
+  .pin-modal { width: min(400px, 90vw) !important; }
+}
+
+/* ── Touch-friendly tap targets ── */
+@media (hover: none) and (pointer: coarse) {
+  .nav-links a, .nav-links button { min-height: 44px; display: flex; align-items: center; }
+  .sku-check-item { min-height: 44px; }
+  .tier-tab { min-height: 44px; }
+  .gi-input { min-height: 44px; }
+  .form-input, .form-select, .reg-input { min-height: 48px; font-size: 16px; }
+}
