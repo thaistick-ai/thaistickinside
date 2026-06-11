@@ -1,4 +1,4 @@
-const SHEET_ID = '1Ej8TIfKZdOMSQKJ5-08PhNguRlnAZtKcBT4lA_8ussg';
+const SHEET_ID = '1YYmGFbeviXdl7P0a9dgq_ICLextUnfDNillE9pQkDrc';
 
 function doGet(e) {
   const sheetName = e.parameter.sheet;
@@ -37,7 +37,9 @@ function doPost(e) {
         ws = ss.insertSheet('Enquiries');
         ws.appendRow(['timestamp','first_name','last_name','company','email','phone','message','meeting_date']);
       }
+      const eRow = ws.getLastRow() + 1;
       ws.appendRow([ts, data.first_name||'', data.last_name||'', data.company||'', data.email||'', data.phone||'', data.message||'', data.meeting_date||'']);
+      ws.getRange(eRow, 6).setNumberFormat('@');
 
     } else if (data.sheet === 'VisitorLog') {
       let ws = ss.getSheetByName('Visitor Log');
@@ -45,15 +47,19 @@ function doPost(e) {
         ws = ss.insertSheet('Visitor Log');
         ws.appendRow(['timestamp','name','company','email','phone']);
       }
+      const vRow = ws.getLastRow() + 1;
       ws.appendRow([ts, data.name||'', data.company||'', data.email||'', data.phone||'']);
+      ws.getRange(vRow, 5).setNumberFormat('@');
 
     } else {
       let ws = ss.getSheetByName('Rep_Log');
       if (!ws) {
         ws = ss.insertSheet('Rep_Log');
-        ws.appendRow(['timestamp','rep_name','clinic_name','contact_name','email','contact_number','outcome','next_meeting_date','next_meeting_time','interested_sku','notes']);
+        ws.appendRow(['timestamp','rep_name','clinic_name','contact_name','email','contact_number','interested_sku','next_meeting_date','next_meeting_time','notes','outcome']);
       }
-      ws.appendRow([ts, data.rep_name||'', data.clinic_name||'', data.contact_name||'', data.email||'', data.contact_number||'', data.outcome||'', data.next_meeting_date||'', data.next_meeting_time||'', data.interested_sku||'', data.notes||'']);
+      const rRow = ws.getLastRow() + 1;
+      ws.appendRow([ts, data.rep_name||'', data.clinic_name||'', data.contact_name||'', data.email||'', data.contact_number||'', data.interested_sku||'', data.next_meeting_date||'', data.next_meeting_time||'', data.notes||'', data.outcome||'']);
+      ws.getRange(rRow, 6).setNumberFormat('@');
     }
 
     return ContentService
